@@ -36,13 +36,40 @@ class Handler(webapp2.RequestHandler):
         self.write(self.render_str(template, **kw))
 
 
-class MainPage(Handler):
-    def render_front(self, title="", matter="", error=""):
-        self.render("blog.html", subject=title, content=matter, error=error)
+class Post(db.Model):
+
+    subject = db.StringProperty(required = True)
+    content = db.TextProperty(required = True)
+    created = db.DateTimeProperty(auto_now_add = True)
+
+class NewPostHandler(Handler):
+    def render_front(self, subject="", content="", error=""):
+        self.render("newPost.html", subject=subject, content=content, error=error)
 
     def get(self):
         self.render_front()
 
+    def post(self):
+        subject = self.request.get('subject')
+        content = self.request.get('content')
+
+        a = Post(subject = subject, content = content)
+        a.put()
+
+        if subject and content:
+            self.redirect('/blog')
+        else:
+            error = "Please enter subject as well as content in order to submit the post!"
+            self.render_front(subject=subject, content=content, error=error)
+
+class MainPageHandler(Handler):
+    def get(self):
+
+        blogPosts = db.GqlQuery("SELECT * FROM Post ORDER BY created DESC LIMIT 10")
+
+        self.render("blog.html", blogPosts=blogPosts)
+
 app = webapp2.WSGIApplication([
-    ('/', MainPage)
+    ('/blog/newpost', NewPostHandler),
+    ('/blog', MainPageHandler)
 ], debug=True)
