@@ -71,6 +71,9 @@
 				<b>{{ post.subject }}</b>
 			</div>
 			<pre class="post-body">{{ post.content }}</pre>
+			{{ post.key() }}
+			<br>
+			{{ post.key().id() }}
 		</div>
 		{% endfor %}
 	</body>

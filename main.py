@@ -55,6 +55,11 @@ class NewPostHandler(Handler):
 
         a = Post(subject = subject, content = content)
         a.put()
+        key = a.key()
+        key_id = key.id()
+
+        print 'key =', key
+        print 'key.id() =', key_id
 
         if subject and content:
             self.redirect('/blog')
