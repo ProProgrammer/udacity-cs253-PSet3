@@ -18,6 +18,8 @@ import webapp2
 import os
 import jinja2
 
+import re
+
 from google.appengine.ext import db
 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
@@ -55,26 +57,27 @@ class NewPostHandler(Handler):
 
         a = Post(subject = subject, content = content)
         a.put()
-        key = a.key()
-        key_id = key.id()
-
-        print 'key =', key
-        print 'key.id() =', key_id
+        keyID = a.key().id()
 
         if subject and content:
-            self.redirect('/blog')
+            self.redirect('/blog/%s' % keyID)
         else:
             error = "Please enter subject as well as content in order to submit the post!"
             self.render_front(subject=subject, content=content, error=error)
 
-class MainPageHandler(Handler):
+class BlogHandler(Handler):
     def get(self):
 
         blogPosts = db.GqlQuery("SELECT * FROM Post ORDER BY created DESC LIMIT 10")
 
         self.render("blog.html", blogPosts=blogPosts)
 
+class PostHandler(Handler):
+    def get(self):
+        self.write("Thanks for submitting!")
+
 app = webapp2.WSGIApplication([
     ('/blog/newpost', NewPostHandler),
-    ('/blog', MainPageHandler)
+    ('/blog', BlogHandler),
+    (r'/blog/[0-9]+', PostHandler)
 ], debug=True)
