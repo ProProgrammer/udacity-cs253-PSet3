@@ -57,7 +57,7 @@ class NewPostHandler(Handler):
 
         a = Post(subject = subject, content = content)
         a.put()
-        keyID = a.key().id()
+        keyID = str(a.key().id())
 
         if subject and content:
             self.redirect('/blog/%s' % keyID)
@@ -73,11 +73,17 @@ class BlogHandler(Handler):
         self.render("blog.html", blogPosts=blogPosts)
 
 class PostHandler(Handler):
-    def get(self):
-        self.write("Thanks for submitting!")
+    def get(self, keyID):
+        post = Post.get_by_id(int(keyID), parent=None)
+        
+        if not post:
+            self.error(404)
+            return
+        else:
+            self.render("postPage.html", post=post)
 
 app = webapp2.WSGIApplication([
     ('/blog/newpost', NewPostHandler),
     ('/blog', BlogHandler),
-    (r'/blog/[0-9]+', PostHandler)
+    (r'/blog/([0-9]+)', PostHandler)
 ], debug=True)

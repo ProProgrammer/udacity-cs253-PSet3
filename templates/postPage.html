@@ -65,13 +65,11 @@
 	<body>
 		<h1 class="center-align">Deep's Blog</h1>
 		<hr>
-		{% for post in blogPosts %}
 		<div class="post">
 			<div class="post-subject">
 				<b>{{ post.subject }}</b>
 			</div>
 			<pre class="post-body">{{ post.content }}</pre>
 		</div>
-		{% endfor %}
 	</body>
 </html>
